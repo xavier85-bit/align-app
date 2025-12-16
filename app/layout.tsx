@@ -1,36 +1,44 @@
-import type { Metadata } from "next";
-// 引入两种高级字体：Inter (无衬线) 和 Playfair Display (衬线)
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google"; 
-import "./globals.css"; // 👈 关键！必须保留以加载 Tailwind 和自定义样式
+import "./globals.css"; 
 
-// 1. 配置字体
-// Inter 用于 UI 元素、按钮、正文，给人现代、清晰的感觉
 const inter = Inter({ 
   subsets: ["latin"], 
   variable: "--font-inter",
-  display: "swap", // 优化加载策略
+  display: "swap", 
 });
 
-// Playfair Display 用于大标题、Slogan，给人优雅、神秘的感觉
 const playfair = Playfair_Display({ 
   subsets: ["latin"], 
   variable: "--font-playfair",
   display: "swap",
 });
 
-// 2. 配置 SEO 元数据
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover", 
+  themeColor: "#0f0c29", 
+};
+
 export const metadata: Metadata = {
   title: {
-    template: "%s | 合相 ALIGN", // 子页面标题模版
-    default: "合相 ALIGN",       // 默认标题
+    template: "%s | 合相 ALIGN",
+    default: "合相 ALIGN",
   },
-  description: "Metaphysics Style Guide - 你的形而上学生活指南",
+  description: "Metaphysics Style Guide",
+  appleWebApp: {
+    capable: true,
+    title: "合相 ALIGN",
+    statusBarStyle: "black-translucent", 
+  },
   icons: {
-    icon: "/favicon.ico", // 建议后续放一个 favicon 文件在 public 文件夹
+    icon: "/favicon.ico", 
   },
 };
 
-// 3. 根布局组件
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,14 +55,30 @@ export default function RootLayout({
           text-white 
           h-full 
           m-0 p-0
-          overflow-hidden
+          /* ⚠️ 移除了 overflow-hidden，允许内容自然滚动，解决无法拉到底部的问题 */
         `}
       >
-        {/* ✨ 修复点：z-index 改为 0 (原为 -2) ✨ */}
-        <div className="fixed -top-[100px] -left-[100px] -right-[100px] -bottom-[100px] z-0 bg-aurora-animate pointer-events-none" />
+        {/* --- 背景层系统 --- */}
+        
+        {/* 1. 纯色衬底 (z-[-3]): 防止透明时透出白色，彻底消灭黑边 */}
+        <div className="fixed inset-0 z-[-3] bg-[#0f0c29]" />
 
-        {/* 内容层 z-index 保持 10 不变，确保浮在背景之上 */}
-        <main className="flex-grow flex flex-col relative z-10 w-full h-full overflow-y-auto">
+        {/* 2. 呼吸极光层 (z-[-2]): 使用内联样式确保渐变绝对生效 */}
+        <div 
+          className="fixed -top-[100px] -left-[100px] -right-[100px] -bottom-[100px] z-[-2] animate-breathe pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(circle at 15% 50%, rgba(27, 20, 100, 0.5) 0%, transparent 50%),
+              radial-gradient(circle at 85% 30%, rgba(67, 50, 180, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 50% 0%, #1B1464 0%, #0f0c29 60%, #050414 100%)
+            `,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+
+        {/* 3. 内容层 (z-10): 使用 relative 让其在背景之上自然流动 */}
+        <main className="flex-grow flex flex-col relative z-10 w-full min-h-full">
           {children}
         </main>
       </body>

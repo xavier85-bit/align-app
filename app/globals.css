@@ -2,7 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 1. 基础层：重置与全局变量 */
+/* 1. 基础重置 (强制透明，防止遮挡底层背景) */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /* ⚠️ 核心：必须透明，否则z-index为负的背景看不见 */
+  background-color: transparent !important; 
+  color: var(--foreground);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 2. 定义呼吸动画关键帧 (只控制缩放和亮度，不控制颜色) */
+@keyframes breathe {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.05); filter: brightness(1.2); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* 3. 动画工具类 */
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+/* 4. 其他样式保持不变 */
 @layer base {
   :root {
     --background: #0f0c29;
@@ -12,35 +38,9 @@
     --font-inter: 'Inter', sans-serif;
   }
 
-  html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    /* 强制透明，防止遮挡 Canvas 星空 */
-    background-color: transparent !important; 
-    color: var(--foreground);
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* 极光呼吸动画定义 */
-  @keyframes aurora-breathe {
-    0% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0.6; transform: scale(1); }
-  }
-
-  /* 强制覆盖 Shadcn 下拉菜单样式 */
-  .border-input, .border-border {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
-
-  [data-radix-popper-content-wrapper] {
-    z-index: 100 !important;
-  }
-
+  /* 强制覆盖 Shadcn 默认样式 */
+  .border-input, .border-border { border-color: rgba(255, 255, 255, 0.1) !important; }
+  [data-radix-popper-content-wrapper] { z-index: 100 !important; }
   div[role="listbox"], div[data-radix-select-viewport] {
     background-color: rgba(20, 20, 30, 0.95) !important;
     backdrop-filter: blur(20px) !important;
@@ -48,68 +48,30 @@
     color: white !important;
     border-radius: 16px !important;
   }
-
   div[role="option"]:hover, div[role="option"][data-highlighted] {
     background-color: rgba(255, 255, 255, 0.1) !important;
     color: #D4AF37 !important;
     cursor: pointer;
   }
-
-  *:focus {
-    outline: none !important;
-    ring: 0 !important;
-  }
+  *:focus { outline: none !important; ring: 0 !important; }
 }
 
-/* 2. 组件层：自定义类 */
 @layer components {
-  /* 极光呼吸背景类 */
-  .bg-aurora-animate {
-    background: 
-      radial-gradient(circle at 15% 50%, rgba(27, 20, 100, 0.5) 0%, transparent 50%),
-      radial-gradient(circle at 85% 30%, rgba(67, 50, 180, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 50% 0%, #1B1464 0%, #0f0c29 60%, #050414 100%);
-    background-size: cover;
-    background-position: center;
-    animation: aurora-breathe 8s ease-in-out infinite;
-  }
-
-  /* 通用毛玻璃面板 */
+  /* 玻璃卡片 */
   .glass-panel {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
-
-  /* 按钮样式 (改回标准 CSS，彻底解决 @apply 报错) */
+  /* 按钮 */
   .btn-primary {
-    min-width: 160px;
-    height: 56px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;        /* 对应 font-semibold */
-    font-size: 1.125rem;     /* 对应 text-lg */
-    color: white;
-    border-radius: 9999px;   /* 对应 rounded-full */
-    transition: all 0.3s ease;
-    
-    /* 磨砂效果 */
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 160px; height: 56px; display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 1.125rem; color: white; border-radius: 9999px; transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2);
   }
-
   .btn-primary:hover {
-    background: rgba(212, 175, 55, 0.15);
-    border-color: rgba(212, 175, 55, 0.6);
-    transform: translateY(-2px);
+    background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.6); transform: translateY(-2px);
   }
-
-  .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 }
