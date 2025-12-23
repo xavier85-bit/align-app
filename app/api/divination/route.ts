@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     当前时间是：${currentDate}。
     
     【核心任务】
-    结合用户的【命理能量】(出生日期:${birthDate || "未知"})、【星盘配置】(${zodiac}) 与【当下场景】(${occasion})，提供一份**"结合易经、星盘、mbti心理学、风水学"**的策略指南。
+    结合用户的【社会学身份】(身份: ${identity})、【命理能量】(出生日期:${birthDate || "未知"})、【容格16型人格】(MBTI: ${mbti || "未知"})、【星盘配置】(${zodiac}) 与【当下场景】(${occasion})，提供一份**"结合易经、星盘、mbti心理学、风水学"**的策略指南。
 
     【穿搭建议的逻辑内核 (非常重要)】
     1. **隐性时尚**：你要在内心检索当前的季节流行趋势（色彩/廓形），**但绝不要在文案中直白地说"现在流行什么"**。
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       ],
       model: "deepseek-chat", 
       response_format: { type: "json_object" },
-      temperature: 1.2, // 稍微降低一点温度，保证逻辑更严密，不胡言乱语
+      temperature: 1.3, // 稍微降低一点温度，保证逻辑更严密，不胡言乱语
     });
 
     const content = completion.choices[0].message.content;
