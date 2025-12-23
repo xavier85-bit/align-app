@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     当前时间是：${currentDate}。
     
     【核心任务】
-    结合用户的【命理能量】(出生日期:${birthDate || "未知"})、【星盘配置】(${zodiac}) 与【当下场景】(${occasion})，提供一份**"天人合一"**的策略指南。
+    结合用户的【命理能量】(出生日期:${birthDate || "未知"})、【星盘配置】(${zodiac}) 与【当下场景】(${occasion})，提供一份**"结合易经、星盘、mbti心理学、风水学"**的策略指南。
 
     【穿搭建议的逻辑内核 (非常重要)】
     1. **隐性时尚**：你要在内心检索当前的季节流行趋势（色彩/廓形），**但绝不要在文案中直白地说"现在流行什么"**。
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
     【输出规范】
     严格返回 JSON 格式，所有内容使用中文，语气要优雅、神秘且笃定：
     {
-      "fortuneTitle": "4-6字标题 (如: 离火·破雾见光)",
-      "luckyColor": "颜色名称 (如: 丹砂红 & 墨黑)",
+      "fortuneTitle": "4-6字标题 (格式为 “五行名称”·“一个对应的成语”)",
+      "luckyColor": "颜色名称 (采用中国传统色彩名称显示)",
       "hexCode": "主色HEX (如: #D93025)",
       
       // 板块1：星象与命理洞察
@@ -50,12 +50,12 @@ export async function POST(req: Request) {
       "styleStrategy": "具体的穿搭建议。解释这套搭配如何平衡五行能量与场景需求。若推荐亮色，请务必强调小面积点缀的智慧。(60字左右)",
       
       // 板块3：能量单品
-      "itemRecommendation": "一件具体的开运配饰 (如: 钛钢项链、古铜钱)",
+      "itemRecommendation": "一件具体的开运配饰 (根据时下流行趋势结合用户提供的各项信息推荐能开运的配饰一到两件即可，格式为配件、材质、颜色)",
       
       // 板块4：罗盘
       "energyCompass": {
-        "wealth": "财位及解释 (如: 正西 (多金属摆件处))",
-        "noble": "贵人位及解释 (如: 东南 (靠近水源处))"
+        "wealth": "财位及解释 (根据风水学，周易等传统玄学理论推演当日财位)",
+        "noble": "贵人位及解释 (根据风水学，周易等传统玄学理论推演当日贵人位)"
       },
       
       // 板块5：深度锦囊
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       ],
       model: "deepseek-chat", 
       response_format: { type: "json_object" },
-      temperature: 1.15, // 稍微降低一点温度，保证逻辑更严密，不胡言乱语
+      temperature: 1.2, // 稍微降低一点温度，保证逻辑更严密，不胡言乱语
     });
 
     const content = completion.choices[0].message.content;
