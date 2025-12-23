@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+export const dynamic = 'force-dynamic';
+
 const client = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
   baseURL: "https://api.deepseek.com",
@@ -11,14 +13,24 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { zodiac, mbti, occasion, gender, targetInfo, identity, birthDate } = body;
 
-    // 获取当前日期，用于AI内部判断季节和潜在的流行趋势，但不需要在文案中直说
-    const currentDate = new Date().toLocaleDateString('zh-CN', { month: 'long', year: 'numeric' });
+   // 2. 修改日期获取逻辑，精确到“日”，甚至加上随机数或具体时间，确保 Prompt 唯一
+    // 原代码只获取了年月，导致一个月内 Prompt 一样。
+    // 修改为：包含年月日，甚至可以加上“时辰”概念增强玄学感
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('zh-CN', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }); 
+    // 增加一个具体时间标记，确保由 AI 处理时的随机性（可选）
+    const exactTime = now.toLocaleTimeString('zh-CN'); 
+
     const hasTarget = !!targetInfo; 
 
     const systemPrompt = `
     你是一位精通**古典占星**、**四柱八字**、**荣格心理学**与**高维美学**的资深命运规划师。
-    当前时间是：${currentDate}。
-    
+    当前日期是：${currentDate} (推演时刻: ${exactTime})。 // <--- 修改了这里：加入了具体时间
+
     【核心任务】
     结合用户的【社会学身份】(身份: ${identity})、【命理能量】(出生日期:${birthDate || "未知"})、【容格16型人格】(MBTI: ${mbti || "未知"})、【星盘配置】(${zodiac}) 与【当下场景】(${occasion})，提供一份**"结合易经、星盘、mbti心理学、风水学"**的策略指南。
 
@@ -71,6 +83,7 @@ export async function POST(req: Request) {
     - 场景: ${occasion}
     - 性别: ${gender}
     - 对方信息: ${targetInfo ? JSON.stringify(targetInfo) : "无"}`;
+    - 随机因子: ${Math.random()}`; // <--- 修改了这里：建议在 userPrompt 末尾加个随机数，物理隔绝缓存
 
     const completion = await client.chat.completions.create({
       messages: [
